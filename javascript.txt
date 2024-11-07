@@ -1,0 +1,40 @@
+// Selecting HTML elements
+const expressionInput = document.getElementById('expression');
+const resultOutput = document.getElementById('result');
+const speakBtn = document.getElementById('speak-btn');
+
+// Check if the browser supports SpeechRecognition
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SpeechRecognition) {
+    alert("Your browser does not support speech recognition. Please use Chrome or another compatible browser.");
+} else {
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+
+    // Function to handle voice input
+    speakBtn.addEventListener('click', () => {
+        resultOutput.textContent = ''; // Clear previous result
+        expressionInput.value = ''; // Clear previous input
+        recognition.start();
+    });
+
+    // On recognition result
+    recognition.addEventListener('result', (event) => {
+        const spokenText = event.results[0][0].transcript;
+        expressionInput.value = spokenText;
+
+        // Calculate the result
+        try {
+            const result = eval(spokenText); // Only for simple expressions
+            resultOutput.textContent = `Result: ${result}`;
+        } catch (error) {
+            resultOutput.textContent = "Invalid expression. Please try again.";
+        }
+    });
+
+    // If the speech recognition service ends
+    recognition.addEventListener('end', () => {
+        recognition.stop();
+    });
+}
